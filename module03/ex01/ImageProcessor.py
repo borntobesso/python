@@ -40,4 +40,7 @@ if __name__ == "__main__":
     arr = imp.load("./resources/42AI.png")
     print(arr)
     imp.display(arr)
+    arr = imp.load("./resources/greentea.jpeg")
+    print(arr)
+    imp.display(arr)
     imp.display("not_an_array")
