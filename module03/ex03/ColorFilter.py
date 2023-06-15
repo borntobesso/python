@@ -118,29 +118,18 @@ class ColorFilter:
         if not isinstance(array, np.ndarray):
             print("Input is not a numpy array", sys.stderr)
             return None
-        t1 = array.min() + (array.max() - array.min()) / 4
-        t2 = t1 + (array.max() - array.min()) / 4
-        t3 = t2 + (array.max() - array.min()) / 4
-        t4 = array.max()
         
-        num_shades = 4
+        num_shades = 5
         shades = np.linspace(0, 1, num_shades)
         
         transformed_array = array.copy()
         
-        for i in range(array.shape[0]):
-            for j in range(array.shape[1]):
-                average = (array[i, j, 0] + array[i, j, 1] + array[i, j, 2]) / 3
-                
-                if average <= t1:
-                    transformed_array[i, j] = shades[0]
-                elif average <= t2:
-                    transformed_array[i, j] = shades[1]
-                elif average <= t3:
-                    transformed_array[i, j] = shades[2]
-                else:
-                    transformed_array[i, j] = shades[3]
-                    
+        for i in range(len(shades) - 1):
+            lower_shade = shades[i]
+            upper_shade = shades[i + 1]
+            for channel in range(3):
+                mask = (transformed_array[..., channel] > lower_shade) & (transformed_array[..., channel] <= upper_shade)
+                transformed_array[..., channel][mask] = lower_shade
         return transformed_array
     
     def to_grayscale(self, array, filter, **kwargs):
@@ -165,8 +154,9 @@ class ColorFilter:
         if not isinstance(array, np.ndarray):
             print("Input is not a numpy array", sys.stderr)
             return None
+        grayscale_array = array.copy()
         if filter in ['m', 'mean']:
-            grayscale_array = np.mean(array, axis=2)
+            grayscale_array[...,:3] = np.mean(array[...,:3], axis=2, keepdims=True)
         elif filter in ['w', 'weight']:
             if 'weights' not in kwargs:
                 print("Missing weights argument", sys.stderr)
@@ -178,9 +168,7 @@ class ColorFilter:
             if sum(weights) != 1:
                 print("Sum of weights must be equal to 1", sys.stderr)
                 return None
-            weights = np.array(weights)
-            grayscale_array = np.broadcast_to(weights, array.shape) * array
-            grayscale_array = grayscale_array.sum(axis=2) 
+            grayscale_array[...,:3] = np.sum(array[...,:3] * weights, axis=2, keepdims=True) 
         else:
             print("Invalid filter argument", sys.stderr)
             return None
@@ -188,9 +176,10 @@ class ColorFilter:
     
 if __name__ == "__main__":
     imp = ImageProcessor()
-    # arr = imp.load("./assets/42AI.png")
-    arr = imp.load("./assets/elon_canaGAN.png")
+    arr = imp.load("./assets/42AI.png")
+    # arr = imp.load("./assets/elon_canaGAN.png")
     cf = ColorFilter()
+    # print(arr)
     imp.display(cf.invert(arr))
     imp.display(cf.to_blue(arr))
     imp.display(cf.to_green(arr))
