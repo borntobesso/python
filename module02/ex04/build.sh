@@ -1,6 +1,4 @@
 #!/bin/bash
-python3 -m pip install --upgrade pip
-python3 -m pip install --upgrade build
-python3 -m build
-python3 -m pip install --upgrade twine
-python3 -m twine upload dist/*
+python3 -m pip install --upgrade pip setuptools wheel
+python3 setup.py sdist bdist_wheel
+pip install ./dist/my_minipack-1.0.0.tar.gz
