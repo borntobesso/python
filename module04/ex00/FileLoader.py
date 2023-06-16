@@ -30,6 +30,6 @@ class FileLoader:
             
 if __name__ == "__main__":
     loader = FileLoader()
-    data = loader.load("../data/athlete_events.csv")
+    data = loader.load("../ex01/data/athlete_events.csv")
     loader.display(data, 12)
     loader.display(data, -12)
