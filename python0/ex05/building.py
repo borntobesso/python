@@ -39,5 +39,11 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except AssertionError as e:
-        print(f"AssertionError: {e}")
+    except (AssertionError, KeyboardInterrupt, EOFError) as e:
+        match e.__class__.__name__:
+            case "KeyboardInterrupt":
+                print("\nKeyboardInterrupt")
+            case "EOFError":
+                print("\nEOFError")
+            case _:
+                print(f"AssertionError: {e}")
